@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.exam.dao.PaperDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.exam.entity.PaperEntity" id="paperMap">
+        <result property="id" column="id"/>
+        <result property="majorId" column="major_id"/>
+        <result property="subjectId" column="subject_id"/>
+        <result property="paperTitle" column="paper_title"/>
+        <result property="isChecked" column="is_checked"/>
+        <result property="isAffirm" column="is_affirm"/>
+        <result property="passMark" column="pass_mark"/>
+        <result property="totalPoint" column="total_point"/>
+        <result property="answerNum" column="answer_num"/>
+        <result property="questionNum" column="question_num"/>
+        <result property="examTime" column="exam_time"/>
+        <result property="checkMsg" column="check_msg"/>
+        <result property="difficulty" column="difficulty"/>
+
+
+        <result property="description" column="description"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="getPaperByClazzId" resultMap="paperMap" parameterType="integer">
+        SELECT paper.*
+        FROM exam_paper_clazz paper_clazz
+        LEFT JOIN exam_paper paper on paper_clazz.paper_id = paper.id
+        where paper.is_deleted = 0
+        <if test="clazzId != null">
+            and paper_clazz.clazz_id = #{clazzId}
+        </if>
+    </select>
+</mapper>

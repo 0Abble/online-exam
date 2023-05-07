@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.exam.dao.QuestionDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.exam.entity.QuestionEntity" id="questionMap">
+        <result property="id" column="id"/>
+        <result property="questionTypeId" column="question_type_id"/>
+        <result property="subjectId" column="subject_id"/>
+        <result property="questionTitle" column="question_title"/>
+        <result property="content" column="content"/>
+        <result property="answer" column="answer"/>
+        <result property="analyse" column="analyse"/>
+        <result property="score" column="score"/>
+        <result property="difficulty" column="difficulty"/>
+
+
+        <result property="description" column="description"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap id="QestionNumVo" type="io.renren.modules.exam.entity.vo.QuestionNumVO">
+        <result property="questionTypeId" column="question_type_id"/>
+        <result property="typeName" column="type_name"/>
+        <result property="score" column="score"/>
+        <result property="num" column="num"/>
+    </resultMap>
+
+    <select id="getQuestionNumListBySubjectId" resultMap="QestionNumVo" parameterType="integer">
+        SELECT ques.score, ques.question_type_id, type.type_name, COUNT(ques.id) as num
+        FROM exam_question ques LEFT JOIN exam_question_type type ON ques.question_type_id = type.id
+        WHERE ques.is_deleted = 0
+        <if test="subjectId != null">
+            and ques.subject_id = #{subjectId}
+        </if>
+        GROUP BY ques.question_type_id, ques.score
+    </select>
+
+    <select id="getQuestionNumWithSubjectIdGroupByType" resultMap="QestionNumVo" parameterType="integer">
+        SELECT question.question_type_id, type.type_name,COUNT(question.id) as num
+        FROM exam_question question
+        LEFT JOIN exam_question_type type ON question.question_type_id = type.id
+        WHERE question.subject_id = #{subjectId}
+        GROUP BY question.question_type_id
+        ORDER BY type.sort ASC
+    </select>
+</mapper>

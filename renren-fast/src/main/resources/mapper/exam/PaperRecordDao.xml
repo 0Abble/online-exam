@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.exam.dao.PaperRecordDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.exam.entity.PaperRecordEntity" id="paperRecordMap">
+        <result property="id" column="id"/>
+        <result property="paperId" column="paper_id"/>
+        <result property="stuNo" column="stu_no"/>
+        <result property="examScore" column="exam_score"/>
+        <result property="correctNum" column="correct_num"/>
+        <result property="isChecked" column="is_checked"/>
+        <result property="description" column="description"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap id="PaperRecordVO" type="paperRecordVO">
+        <result property="id" column="id"/>
+        <result property="majorId" column="major_id"/>
+        <result property="subjectId" column="subject_id"/>
+        <result property="paperTitle" column="paper_title"/>
+        <result property="isChecked" column="is_checked"/>
+        <result property="isAffirm" column="is_affirm"/>
+        <result property="passMark" column="pass_mark"/>
+        <result property="totalPoint" column="total_point"/>
+        <result property="answerNum" column="answer_num"/>
+        <result property="examTime" column="exam_time"/>
+        <result property="checkMsg" column="check_msg"/>
+        <result property="difficulty" column="difficulty"/>
+
+        <result property="description" column="description"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+
+        <result property="examScore" column="exam_score"/>
+        <result property="correctNum" column="correct_num"/>
+        <result property="submitTime" column="submit_time"/>
+        <result property="paperStatus" column="paper_status"/>
+
+        <result property="className" column="class_name"/>
+        <result property="paperRecordId" column="paper_record_id"/>
+    </resultMap>
+
+    <resultMap id="PaperCorrectingVO" type="paperCorrectingVO">
+        <result property="id" column="id"/>
+        <result property="majorId" column="major_id"/>
+        <result property="subjectId" column="subject_id"/>
+        <result property="paperTitle" column="paper_title"/>
+        <result property="isChecked" column="is_checked"/>
+        <result property="isAffirm" column="is_affirm"/>
+        <result property="passMark" column="pass_mark"/>
+        <result property="totalPoint" column="total_point"/>
+        <result property="answerNum" column="answer_num"/>
+        <result property="examTime" column="exam_time"/>
+        <result property="checkMsg" column="check_msg"/>
+        <result property="difficulty" column="difficulty"/>
+
+        <result property="description" column="description"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+
+        <result property="examScore" column="exam_score"/>
+        <result property="correctNum" column="correct_num"/>
+        <result property="submitTime" column="submit_time"/>
+        <result property="paperStatus" column="paper_status"/>
+
+        <result property="className" column="class_name"/>
+        <result property="stuNo" column="stu_no"/>
+        <result property="stuName" column="stu_name"/>
+        <result property="paperRecordId" column="paper_record_id"/>
+    </resultMap>
+
+
+    <resultMap id="StuScoreVOMap" type="stuScoreVO">
+        <result property="id" column="id"/>
+        <result property="paperId" column="paper_id"/>
+        <result property="stuNo" column="stu_no"/>
+        <result property="examScore" column="exam_score"/>
+        <result property="correctNum" column="correct_num"/>
+        <result property="isChecked" column="is_checked"/>
+        <result property="description" column="description"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+
+        <result property="paperTitle" column="paper_title"/>
+        <result property="passMark" column="pass_mark"/>
+        <result property="totalPoint" column="total_point"/>
+        <result property="stuName" column="stu_name"/>
+        <result property="major" column="major"/>
+        <result property="clazz" column="clazz"/>
+        <result property="subjectId" column="subject_id"/>
+
+    </resultMap>
+
+    <select id="queryPaperRecordByStuNo" parameterType="paperRecordDTO" resultMap="PaperRecordVO">
+        SELECT
+            paper_record.id as paper_record_id,
+            paper_record.create_time as submit_time,
+            paper_record.is_checked as paper_status,
+            paper_record.correct_num,
+            paper_record.exam_score,
+            paper.*,
+            clazz.class_name
+        FROM exam_paper paper
+        RIGHT JOIN exam_paper_record paper_record ON paper_record.paper_id = paper.id
+        LEFT JOIN (
+            SELECT paper_clazz .*, clazz.class_name FROM exam_paper_clazz paper_clazz LEFT JOIN exam_clazz clazz ON paper_clazz.clazz_id = clazz.id
+        ) clazz ON paper.id = clazz.paper_id
+        where paper_record.stu_no = #{recordDTO.stuNo}
+        <if test="recordDTO.paperTitle != null and recordDTO.paperTitle != ''">
+            and paper.paper_title like concat(concat('%', #{recordDTO.paperTitle}), '%')
+        </if>
+        <if test="recordDTO.majorId != null">
+            and paper.major_id = #{recordDTO.majorId}
+        </if>
+        <if test="recordDTO.subjectId != null">
+            and paper.subject_id = #{recordDTO.subjectId}
+        </if>
+        <if test="recordDTO.isChecked != null">
+            and paper_record.is_checked = #{recordDTO.isChecked}
+        </if>
+        <if test="recordDTO.clazzId != null">
+            and clazz.clazz_id = #{recordDTO.clazzId}
+        </if>
+    </select>
+
+    <select id="queryPaperCorrecting" resultMap="PaperCorrectingVO" parameterType="paperRecordDTO">
+        SELECT
+            paper_record.id as paper_record_id,
+            paper_record.create_time as submit_time,
+            paper_record.is_checked as paper_status,
+            paper_record.correct_num,
+            paper_record.exam_score,
+            paper_record.stu_no,
+            paper_record.stu_name,
+            paper.*,
+            clazz.class_name
+        FROM exam_paper paper
+        RIGHT JOIN (
+            SELECT paper_record.*, stu.stu_name FROM	exam_paper_record paper_record LEFT JOIN exam_student stu ON paper_record.stu_no = stu.stu_no
+        ) paper_record
+        ON paper_record.paper_id = paper.id
+        LEFT JOIN (
+            SELECT paper_clazz .*, clazz.class_name FROM exam_paper_clazz paper_clazz LEFT JOIN exam_clazz clazz ON paper_clazz.clazz_id = clazz.id
+        ) clazz ON paper.id = clazz.paper_id
+        WHERE	paper.is_deleted = 0
+        <if test="correctingDTO.paperTitle != null and correctingDTO.paperTitle != ''">
+            and paper.paper_title like concat(concat('%', #{correctingDTO.paperTitle}), '%')
+        </if>
+        <if test="correctingDTO.majorId != null">
+            and paper.major_id = #{correctingDTO.majorId}
+        </if>
+        <if test="correctingDTO.subjectId != null">
+            and paper.subject_id = #{correctingDTO.subjectId}
+        </if>
+        <if test="correctingDTO.isChecked != null">
+            and paper_record.is_checked = #{correctingDTO.isChecked}
+        </if>
+        <if test="correctingDTO.clazzId != null">
+            and clazz.clazz_id = #{correctingDTO.clazzId}
+        </if>
+        <if test="correctingDTO.stuNo != null and correctingDTO.stuNo != ''">
+            and paper_record.stu_no = #{correctingDTO.stuNo}
+        </if>
+        <if test="correctingDTO.stuName != null and correctingDTO.stuName != ''">
+            and paper_record.stu_name concat(concat('%', #{correctingDTO.stuName}), '%')
+        </if>
+    </select>
+
+
+    <select id="queryStuScorePage" resultMap="StuScoreVOMap" parameterType="stuScoreVO">
+        SELECT
+            paper_record.*,
+            paper.paper_title,
+            paper.pass_mark,
+            paper.total_point,
+            paper.subject_id,
+            stu.stu_name,
+            stu.major,
+            stu.clazz
+        FROM exam_paper_record paper_record
+        LEFT JOIN exam_paper paper ON paper_record.paper_id = paper.id
+        LEFT JOIN exam_student stu ON paper_record.stu_no = stu.stu_no
+        WHERE paper_record.is_deleted = 0
+        <if test="params.paperTitle != null and params.paperTitle != ''">
+            and paper.paper_title like concat(concat('%', #{params.paperTitle}), '%')
+        </if>
+        <if test="params.subjectId != null">
+            and paper.subject_id = #{params.subjectId}
+        </if>
+        <if test="params.stuName != null and params.stuName != ''">
+            and stu.stu_name like concat(concat('%', #{params.stuName}), '%')
+        </if>
+        <if test="params.major != null">
+            and stu.major = #{params.major}
+        </if>
+        <if test="params.clazz != null">
+            and  stu.clazz = #{params.clazz}
+        </if>
+    </select>
+</mapper>

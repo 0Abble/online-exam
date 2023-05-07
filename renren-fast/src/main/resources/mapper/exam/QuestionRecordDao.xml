@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.exam.dao.QuestionRecordDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.exam.entity.QuestionRecordEntity" id="questionRecordMap">
+        <result property="id" column="id"/>
+        <result property="paperRecordId" column="paper_record_id"/>
+        <result property="questionId" column="question_id"/>
+        <result property="stuAnswer" column="stu_answer"/>
+        <result property="isRight" column="is_right"/>
+        <result property="score" column="score"/>
+    </resultMap>
+
+    <resultMap id="questionRecordListMap" type="questionRecordList">
+        <result property="id" column="id"/>
+        <result property="questionTypeId" column="question_type_id"/>
+        <result property="subjectId" column="subject_id"/>
+        <result property="questionTitle" column="question_title"/>
+        <result property="content" column="content"/>
+        <result property="answer" column="answer"/>
+        <result property="analyse" column="analyse"/>
+        <result property="score" column="score"/>
+        <result property="difficulty" column="difficulty"/>
+
+
+        <result property="description" column="description"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+
+        <result property="stuAnswer" column="stu_answer"/>
+        <result property="questionRecordId" column="question_record_id"/>
+    </resultMap>
+
+
+    <select id="questionRecordsByQuesResId" resultMap="questionRecordListMap">
+        SELECT question_record.stu_answer, question_record.id as question_record_id, question.*
+        FROM exam_question_record question_record
+        LEFT JOIN exam_question question ON question_record.question_id = question.id
+        WHERE question_record.paper_record_id = #{quesResId} and question.question_type_id = #{typeId}
+    </select>
+</mapper>
